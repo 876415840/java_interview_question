@@ -14,13 +14,13 @@
 >
 > 只不过Stream是单向的，譬如：InputStream/OutputStream.而Channel是双向的，既可以用来进行读操作，又可以用来进行写操作
 
-![channel](./channel.png)
+![channel](channel.png)
 
 ## Buffer(缓冲区)
 
 > 可以将Buffer看做内存中的一块区域，我们可以在这块区域上写数据，然后在从中读取。这块内存区域被包装成NIO Buffer对象，提供了一系列的方法使我们操作这块内存变得更简单一些
 
-![buffer](./buffer.png)
+![buffer](buffer.png)
 
 ### capacity
 
@@ -51,7 +51,7 @@ channel.read(buffers);
 
 > 当channel的read()方法传入多个buffer时，会按顺序写入到多个buffer中，第一个buffer写满后，写入下一个，依次直至写满所有buffer
 
-![scatter](./scatter.png)
+![scatter](scatter.png)
 
 ### Gather
 
@@ -70,10 +70,10 @@ channel.write(bufferArray);
 >
 > write()操作只会写入buffer中已写入的数据，即position到limit之间的数据；例如一个buffer的容量为128字节，但buffer中只写入了28字节的数据，只有这28个字节会写入channel中
 
-![gather](./gather.png)
+![gather](gather.png)
 
 ## Selector(选择器)
 
 > Selector是Java NIO中用于管理一个或多个Channel的组件，控制决定对哪些Channel进行读写；通过使用Selector让一个单线程可以管理多个Channel甚至多个网络连接 -- 控制多路复用
 
-![selector](./selector.png)
+![selector](selector.png)

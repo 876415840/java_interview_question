@@ -10,7 +10,7 @@
 - InputStreamReader/OutputStreamReader ,  字节和字符的转换桥梁，在网络通信或者处理键盘输入的时候用
 - BufferedReader/BufferedWriter ， BufferedInputStream/BufferedOutputStream ， 缓冲流用来包装字节流后者字符流，提升IO性能，BufferedReader还可以方便地读取一行，简化编程。
 
-![io](./io.jpeg)
+![io](io.jpeg)
 
 ## 字节流和字符流的区别
 
