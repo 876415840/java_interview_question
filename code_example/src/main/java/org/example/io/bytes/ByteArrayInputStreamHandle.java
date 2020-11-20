@@ -1,4 +1,4 @@
-package org.example.io.bytes.input;
+package org.example.io.bytes;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

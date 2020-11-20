@@ -4,6 +4,7 @@
 
 - FileInputStream/FileOutputStream  需要逐个字节处理原始二进制流的时候使用，效率低下
 - FileReader/FileWriter 需要组个字符处理的时候使用
+  > 内部使用FileInputStream、FileOutputStream读取、写入数据，将字节流再转换为字符流
 - StringReader/StringWriter 需要处理字符串的时候，可以将字符串保存为字符数组
 - PrintStream/PrintWriter 用来包装FileOutputStream 对象，方便直接将String字符串写入文件 
 - Scanner　用来包装System.in流，很方便地将输入的String字符串转换成需要的数据类型
