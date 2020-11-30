@@ -1,10 +1,12 @@
 package com.stephen.client;
 
-import com.stephen.protocol.PacketCodeC;
+import com.stephen.client.handler.LoginResponseHandler;
+import com.stephen.client.handler.MessageResponseHandler;
+import com.stephen.codec.PacketDecoder;
+import com.stephen.codec.PacketEncoder;
 import com.stephen.protocol.request.MessageRequestPacket;
 import com.stephen.util.LoginUtil;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -43,8 +45,12 @@ public class NettyClient {
                     protected void initChannel(Channel ch) throws Exception {
                         // 当前链接相关的逻辑处理链 -- 责任链模式
                         ch.pipeline()
-                                // 添加一个逻辑处理器，向服务端写数据
-                                .addLast(new ClientHandler());
+                                // 1、解码 -> 2、处理登录/消息 -> 3、编码(对第2步时的响应对象编码)
+                                .addLast(new PacketDecoder())
+                                .addLast(new LoginResponseHandler())
+                                .addLast(new MessageResponseHandler())
+                                // 对channel中写入的数据编码
+                                .addLast(new PacketEncoder());
                     }
                 })
                 // 表示连接的超时时间，超过这个时间还是建立不上的话则代表连接失败
@@ -98,8 +104,7 @@ public class NettyClient {
 
                     MessageRequestPacket packet = new MessageRequestPacket();
                     packet.setMessage(line);
-                    ByteBuf byteBuf = PacketCodeC.INSTANCE.encode(channel.alloc(), packet);
-                    channel.writeAndFlush(byteBuf);
+                    channel.writeAndFlush(packet);
                 }
             }
         }).start();

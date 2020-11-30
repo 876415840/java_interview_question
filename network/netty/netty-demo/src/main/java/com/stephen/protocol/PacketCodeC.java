@@ -44,18 +44,17 @@ public class PacketCodeC {
     /**
      * 对数据对象进行编码 -- 转为二进制数据
      *
+     * @param byteBuf
      * @param packet
      * @return io.netty.buffer.ByteBuf
      * @author stephen
      * @date 2020/11/27 10:45 上午
      */
-    public ByteBuf encode(ByteBufAllocator byteBufAllocator, Packet packet) {
-        // 1. 创建 ByteBuf 对象
-        ByteBuf byteBuf = byteBufAllocator.ioBuffer();
-        // 2. 序列化 java 对象
+    public ByteBuf encode(ByteBuf byteBuf, Packet packet) {
+        // 序列化 java 对象
         byte[] bytes = Serializer.DEFAULT.serialize(packet);
 
-        // 3. 实际编码过程
+        // 实际编码过程
         byteBuf.writeInt(MAGIC_NUMBER);
         byteBuf.writeByte(packet.getVersion());
         byteBuf.writeByte(Serializer.DEFAULT.getSerializerAlgorithm());

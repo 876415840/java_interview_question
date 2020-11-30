@@ -1,11 +1,9 @@
 package com.stephen.server;
 
-import com.stephen.server.handler.inbound.InBoundHandlerA;
-import com.stephen.server.handler.inbound.InBoundHandlerB;
-import com.stephen.server.handler.inbound.InBoundHandlerC;
-import com.stephen.server.handler.outbound.OutBoundHandlerA;
-import com.stephen.server.handler.outbound.OutBoundHandlerB;
-import com.stephen.server.handler.outbound.OutBoundHandlerC;
+import com.stephen.codec.PacketDecoder;
+import com.stephen.codec.PacketEncoder;
+import com.stephen.server.handler.LoginRequestHandler;
+import com.stephen.server.handler.MessageRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -47,16 +45,12 @@ public class NettyServer {
                     protected void initChannel(NioSocketChannel ch) {
                         // 当前链接相关的逻辑处理链 -- 责任链模式
                         ch.pipeline()
-                        // 添加一个逻辑处理器，读取客户端发送数据
-//                                .addLast(new ServerHandler());
-                                // inBound，处理读数据的逻辑链
-                                .addLast(new InBoundHandlerA())
-                                .addLast(new InBoundHandlerB())
-                                .addLast(new InBoundHandlerC())
-                                // outBound，处理写数据的逻辑链
-                                .addLast(new OutBoundHandlerA())
-                                .addLast(new OutBoundHandlerB())
-                                .addLast(new OutBoundHandlerC());
+                                // 1、解码 -> 2、处理登录/消息 -> 3、编码(对第二步时的响应对象编码)
+                                .addLast(new PacketDecoder())
+                                .addLast(new LoginRequestHandler())
+                                .addLast(new MessageRequestHandler())
+                                // 对channel中写入的数据编码
+                                .addLast(new PacketEncoder());
 
                     }
                 })
