@@ -2,6 +2,7 @@ package com.stephen.server;
 
 import com.stephen.codec.PacketDecoder;
 import com.stephen.codec.PacketEncoder;
+import com.stephen.server.handler.LifeCyCleTestHandler;
 import com.stephen.server.handler.LoginRequestHandler;
 import com.stephen.server.handler.MessageRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -44,6 +45,8 @@ public class NettyServer {
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
                     protected void initChannel(NioSocketChannel ch) {
+                        // 添加到第一个，查看 ChannelHandler 回调方法执行顺序
+                        ch.pipeline().addLast(new LifeCyCleTestHandler());
                         // 当前链接相关的逻辑处理链 -- 责任链模式
                         ch.pipeline()
                                 // 基于长度域拆包器 （数据包长度上限，长度值偏移量，长度值字节数）-- 参照自定义通信协议

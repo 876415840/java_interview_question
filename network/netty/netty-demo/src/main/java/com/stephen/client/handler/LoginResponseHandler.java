@@ -18,7 +18,6 @@ public class LoginResponseHandler extends SimpleChannelInboundHandler<LoginRespo
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         // 覆盖了 channelActive()方法，这个方法会在客户端连接建立成功之后被调用
-
         System.out.println(new Date() + ": 客户端开始登录");
 
         // 创建登录数据对象
