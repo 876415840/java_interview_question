@@ -7,7 +7,6 @@ import com.stephen.protocol.response.MessageResponsePacket;
 import com.stephen.serialize.Serializer;
 import com.stephen.serialize.impl.JSONSerializer;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +15,7 @@ import static com.stephen.protocol.Command.*;
 
 /**
  * 数据编码解码
- * 首位开始依次是 4个字节的魔数，1个字节的版本号，1个字节的序列化算法，1个字节的指令，4个字节的数据长度，N个字节的数据内容
+ * 自定义通信协议：首位开始依次是 4个字节的魔数，1个字节的版本号，1个字节的序列化算法，1个字节的指令，4个字节的数据长度，N个字节的数据内容
  *
  * @author stephen
  * @date 2020/11/27 10:39 上午

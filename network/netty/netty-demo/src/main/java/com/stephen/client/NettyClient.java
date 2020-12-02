@@ -13,6 +13,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 import java.util.Date;
 import java.util.Scanner;
@@ -45,6 +46,8 @@ public class NettyClient {
                     protected void initChannel(Channel ch) throws Exception {
                         // 当前链接相关的逻辑处理链 -- 责任链模式
                         ch.pipeline()
+                                // 基于长度域拆包器 （数据包长度上限，长度值偏移量，长度值字节数）-- 参照自定义通信协议
+                                .addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 7, 4))
                                 // 1、解码 -> 2、处理登录/消息 -> 3、编码(对第2步时的响应对象编码)
                                 .addLast(new PacketDecoder())
                                 .addLast(new LoginResponseHandler())
