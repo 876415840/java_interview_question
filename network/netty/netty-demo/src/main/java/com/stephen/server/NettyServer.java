@@ -2,6 +2,7 @@ package com.stephen.server;
 
 import com.stephen.codec.PacketDecoder;
 import com.stephen.codec.PacketEncoder;
+import com.stephen.server.handler.AuthHandler;
 import com.stephen.server.handler.LifeCyCleTestHandler;
 import com.stephen.server.handler.LoginRequestHandler;
 import com.stephen.server.handler.MessageRequestHandler;
@@ -54,6 +55,8 @@ public class NettyServer {
                                 // 1、解码 -> 2、处理登录/消息 -> 3、编码(对第二步时的响应对象编码)
                                 .addLast(new PacketDecoder())
                                 .addLast(new LoginRequestHandler())
+                                // 新增加用户认证handler
+                                .addLast(new AuthHandler())
                                 .addLast(new MessageRequestHandler())
                                 // 对channel中写入的数据编码
                                 .addLast(new PacketEncoder());
