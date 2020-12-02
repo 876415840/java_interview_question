@@ -53,3 +53,7 @@
 > demo中每次向客户端写数据都通过writeAndFlush() -- 写并刷新 （这种方式并不高效）\
 > 可以改成只调用write()，然后在channelReadComplete()里调用ctx.channel().flush()方法，相当于批量刷新 \
 > ps: 测试发现客户端关闭时也会调用一次
+
+
+## 一对一单聊原理
+![一对一单聊](一对一单聊原理.png)

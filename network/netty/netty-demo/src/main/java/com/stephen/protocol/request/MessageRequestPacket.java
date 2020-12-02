@@ -12,6 +12,7 @@ import static com.stephen.protocol.Command.MESSAGE_REQUEST;
 @Data
 public class MessageRequestPacket extends Packet {
 
+    private Integer toUserId;
     private String message;
 
     @Override

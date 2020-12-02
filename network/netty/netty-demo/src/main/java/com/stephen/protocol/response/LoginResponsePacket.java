@@ -11,6 +11,9 @@ import static com.stephen.protocol.Command.LOGIN_RESPONSE;
  */
 @Data
 public class LoginResponsePacket extends Packet {
+    private Integer userId;
+
+    private String username;
 
     private boolean success;
 

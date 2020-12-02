@@ -4,6 +4,7 @@ import com.stephen.client.handler.LoginResponseHandler;
 import com.stephen.client.handler.MessageResponseHandler;
 import com.stephen.codec.PacketDecoder;
 import com.stephen.codec.PacketEncoder;
+import com.stephen.protocol.request.LoginRequestPacket;
 import com.stephen.protocol.request.MessageRequestPacket;
 import com.stephen.util.LoginUtil;
 import io.netty.bootstrap.Bootstrap;
@@ -97,17 +98,32 @@ public class NettyClient {
     }
 
     private static void startConsoleThread(Channel channel) {
+        Scanner sc = new Scanner(System.in);
+        LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
         new Thread(() -> {
             while (!Thread.interrupted()) {
                 // 登录成功后可录入消息
                 if (LoginUtil.hasLogin(channel)) {
-                    System.out.println("输入消息发送至服务端: ");
-                    Scanner sc = new Scanner(System.in);
-                    String line = sc.nextLine();
-
+                    String toUserId = sc.next();
+                    String message = sc.next();
                     MessageRequestPacket packet = new MessageRequestPacket();
-                    packet.setMessage(line);
+                    packet.setToUserId(new Integer(toUserId));
+                    packet.setMessage(message);
                     channel.writeAndFlush(packet);
+                } else {
+                    System.out.println("输入用户名登录: ");
+                    String username = sc.nextLine();
+                    loginRequestPacket.setUsername(username);
+                    // 使用默认的密码
+                    loginRequestPacket.setPassword("pwd");
+                    channel.writeAndFlush(loginRequestPacket);
+
+                    try {
+                        // 隔一秒登录一个客户端
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }).start();

@@ -12,6 +12,8 @@ import static com.stephen.protocol.Command.MESSAGE_RESPONSE;
 @Data
 public class MessageResponsePacket extends Packet {
 
+    private Integer fromUserId;
+    private String fromUsername;
     private String message;
 
     @Override
