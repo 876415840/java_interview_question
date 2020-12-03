@@ -6,6 +6,7 @@ import com.stephen.client.handler.*;
 import com.stephen.codec.PacketDecoder;
 import com.stephen.codec.PacketEncoder;
 import com.stephen.codec.Spliter;
+import com.stephen.handler.IMIdleStateHandler;
 import com.stephen.util.SessionUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -48,6 +49,8 @@ public class NettyClient {
                     protected void initChannel(Channel ch) throws Exception {
                         // 当前链接相关的逻辑处理链 -- 责任链模式
                         ch.pipeline()
+                                // 空闲检测(放在最前面，防止前面有环节阻断后导致误判)
+                                .addLast(new IMIdleStateHandler())
                                 // 拆包
                                 .addLast(new Spliter())
                                 // 解码(所有处理前的读数据)
@@ -69,7 +72,9 @@ public class NettyClient {
                                 // 群消息响应处理
                                 .addLast(new GroupMessageResponseHandler())
                                 // 编码(所有处理后的写数据)
-                                .addLast(new PacketEncoder());
+                                .addLast(new PacketEncoder())
+                                // 心跳定时器
+                                .addLast(new HeartBeatTimerHandler());
                     }
                 })
                 // 表示连接的超时时间，超过这个时间还是建立不上的话则代表连接失败

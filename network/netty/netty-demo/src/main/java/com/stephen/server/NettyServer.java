@@ -2,10 +2,8 @@ package com.stephen.server;
 
 import com.stephen.codec.PacketCodecHandler;
 import com.stephen.codec.Spliter;
-import com.stephen.server.handler.AuthHandler;
-import com.stephen.server.handler.IMHandler;
-import com.stephen.server.handler.LifeCyCleTestHandler;
-import com.stephen.server.handler.LoginRequestHandler;
+import com.stephen.handler.IMIdleStateHandler;
+import com.stephen.server.handler.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -53,12 +51,16 @@ public class NettyServer {
                         ch.pipeline().addLast(new LifeCyCleTestHandler());
                         // 当前链接相关的逻辑处理链 -- 责任链模式 （每次建立连接都会调用一次）
                         ch.pipeline()
+                                // 空闲检测(放在最前面，防止前面有环节阻断后导致误判)
+                                .addLast(new IMIdleStateHandler())
                                 // 拆包
                                 .addLast(new Spliter())
                                 // 解码/编码(所有处理前/后的读/写数据)
                                 .addLast(PacketCodecHandler.INSTANCE)
                                 // 登录请求处理
                                 .addLast(LoginRequestHandler.INSTANCE)
+                                // 心跳请求处理 -- 放在认证前，不需要认证
+                                .addLast(HeartBeatRequestHandler.INSTANCE)
                                 // 新增加用户认证handler
                                 .addLast(AuthHandler.INSTANCE)
                                 // 其他请求处理(平行处理)
