@@ -1,13 +1,7 @@
 package com.stephen.protocol;
 
-import com.stephen.protocol.request.CreateGroupRequestPacket;
-import com.stephen.protocol.request.LoginRequestPacket;
-import com.stephen.protocol.request.LogoutRequestPacket;
-import com.stephen.protocol.request.MessageRequestPacket;
-import com.stephen.protocol.response.CreateGroupResponsePacket;
-import com.stephen.protocol.response.LoginResponsePacket;
-import com.stephen.protocol.response.LogoutResponsePacket;
-import com.stephen.protocol.response.MessageResponsePacket;
+import com.stephen.protocol.request.*;
+import com.stephen.protocol.response.*;
 import com.stephen.serialize.Serializer;
 import com.stephen.serialize.impl.JSONSerializer;
 import io.netty.buffer.ByteBuf;
@@ -42,6 +36,12 @@ public class PacketCodeC {
         packetTypeMap.put(LOGOUT_RESPONSE, LogoutResponsePacket.class);
         packetTypeMap.put(CREATE_GROUP_REQUEST, CreateGroupRequestPacket.class);
         packetTypeMap.put(CREATE_GROUP_RESPONSE, CreateGroupResponsePacket.class);
+        packetTypeMap.put(LIST_GROUP_MEMBERS_REQUEST, ListGroupMembersRequestPacket.class);
+        packetTypeMap.put(LIST_GROUP_MEMBERS_RESPONSE, ListGroupMembersResponsePacket.class);
+        packetTypeMap.put(JOIN_GROUP_REQUEST, JoinGroupRequestPacket.class);
+        packetTypeMap.put(JOIN_GROUP_RESPONSE, JoinGroupResponsePacket.class);
+        packetTypeMap.put(QUIT_GROUP_REQUEST, QuitGroupRequestPacket.class);
+        packetTypeMap.put(QUIT_GROUP_RESPONSE, QuitGroupResponsePacket.class);
 
         serializerMap = new HashMap<>();
         Serializer serializer = new JSONSerializer();

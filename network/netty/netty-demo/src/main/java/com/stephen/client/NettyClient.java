@@ -2,10 +2,7 @@ package com.stephen.client;
 
 import com.stephen.client.console.ConsoleCommandManager;
 import com.stephen.client.console.LoginConsoleCommand;
-import com.stephen.client.handler.CreateGroupResponseHandler;
-import com.stephen.client.handler.LoginResponseHandler;
-import com.stephen.client.handler.LogoutResponseHandler;
-import com.stephen.client.handler.MessageResponseHandler;
+import com.stephen.client.handler.*;
 import com.stephen.codec.PacketDecoder;
 import com.stephen.codec.PacketEncoder;
 import com.stephen.codec.Spliter;
@@ -32,7 +29,7 @@ public class NettyClient {
 
     private static final int MAX_RETRY = 4;
     private static final String HOST = "127.0.0.1";
-    private static final int PORT = 1001;
+    private static final int PORT = 8000;
 
     public static void main(String[] args) throws InterruptedException {
         System.out.println("------------------- 客户端启动 --------------------");
@@ -63,6 +60,12 @@ public class NettyClient {
                                 .addLast(new MessageResponseHandler())
                                 // 创建群聊响应处理
                                 .addLast(new CreateGroupResponseHandler())
+                                // 加入群响应处理
+                                .addLast(new JoinGroupResponseHandler())
+                                // 退群响应处理
+                                .addLast(new QuitGroupResponseHandler())
+                                // 获取群成员响应处理
+                                .addLast(new ListGroupMembersResponseHandler())
                                 // 对channel中写入的数据编码
                                 .addLast(new PacketEncoder());
                     }

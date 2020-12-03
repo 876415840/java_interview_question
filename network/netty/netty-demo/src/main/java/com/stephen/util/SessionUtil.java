@@ -3,6 +3,7 @@ package com.stephen.util;
 import com.stephen.attribute.Attributes;
 import com.stephen.session.Session;
 import io.netty.channel.Channel;
+import io.netty.channel.group.ChannelGroup;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2020/12/2 3:52 下午
  */
 public class SessionUtil {
+
     private static final Map<Integer, Channel> userIdChannelMap = new ConcurrentHashMap<>();
+
+    private static final Map<String, ChannelGroup> groupIdChannelGroupMap = new ConcurrentHashMap<>();
 
     public static void bindSession(Session session, Channel channel) {
         userIdChannelMap.put(session.getUserId(), channel);
@@ -39,5 +43,13 @@ public class SessionUtil {
     public static Channel getChannel(Integer userId) {
 
         return userIdChannelMap.get(userId);
+    }
+
+    public static void bindChannelGroup(String groupId, ChannelGroup channelGroup) {
+        groupIdChannelGroupMap.put(groupId, channelGroup);
+    }
+
+    public static ChannelGroup getChannelGroup(String groupId) {
+        return groupIdChannelGroupMap.get(groupId);
     }
 }

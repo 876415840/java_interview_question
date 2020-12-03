@@ -23,7 +23,7 @@ import java.util.Date;
  */
 public class NettyServer {
 
-    private static final int PORT = 1001;
+    private static final int PORT = 8000;
 
     public static void main(String[] args) {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -63,6 +63,12 @@ public class NettyServer {
                                 .addLast(new MessageRequestHandler())
                                 // 创建群聊请求处理
                                 .addLast(new CreateGroupRequestHandler())
+                                // 加入群请求处理
+                                .addLast(new JoinGroupRequestHandler())
+                                // 退群请求处理
+                                .addLast(new QuitGroupRequestHandler())
+                                // 获取群成员请求处理
+                                .addLast(new ListGroupMembersRequestHandler())
                                 // 登出请求处理
                                 .addLast(new LogoutRequestHandler())
                                 // 对channel中写入的数据编码
