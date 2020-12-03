@@ -58,6 +58,10 @@
 ## 一对一单聊原理
 ![一对一单聊](一对一单聊原理.png)
 
+## writeAndFlush()
+> * writeAndFlush()是异步的，可以添加监听回调判断是否执行完毕
+> * writeAndFlush().addListener(future -> {if (future.isDone()) { /\*do something\*/ }});
+
 ## ctx.writeAndFlush() 事件传播路径
 ![ctx.writeAndFlush() 事件传播路径](ctx.writeAndFlush()%20事件传播路径.png)
 > * ctx.writeAndFlush() 是从 pipeline 链中的当前节点开始往前找到第一个 outBound 类型的 handler 把对象往前进行传播，如果这个对象确认不需要经过其他 outBound 类型的 handler 处理，就使用这个方法。 

@@ -51,7 +51,7 @@ public class MessageRequestHandler extends SimpleChannelInboundHandler<MessageRe
             messageResponsePacket.setFromUsername("system");
             messageResponsePacket.setMessage("用户[" + messageRequestPacket.getToUserId() + "]不在线，发送失败！");
             // 响应当前客户端
-            ctx.channel().writeAndFlush(messageResponsePacket);
+            ctx.writeAndFlush(messageResponsePacket);
         }
 
     }

@@ -49,7 +49,7 @@ public class NettyClient {
                     protected void initChannel(Channel ch) throws Exception {
                         // 当前链接相关的逻辑处理链 -- 责任链模式
                         ch.pipeline()
-                                // 空闲检测(放在最前面，防止前面有环节阻断后导致误判)
+                                // 空闲检测(放在最前面，防止前面有环节阻断后导致误判) -- 客户端这里也处理了心跳的响应
                                 .addLast(new IMIdleStateHandler())
                                 // 拆包
                                 .addLast(new Spliter())

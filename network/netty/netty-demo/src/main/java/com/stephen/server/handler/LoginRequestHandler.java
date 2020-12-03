@@ -33,7 +33,7 @@ public class LoginRequestHandler extends SimpleChannelInboundHandler<LoginReques
         // 处理登录
         LoginResponsePacket loginResponsePacket = login(ctx.channel(), loginRequestPacket);
         // 登录响应
-        ctx.channel().writeAndFlush(loginResponsePacket);
+        ctx.writeAndFlush(loginResponsePacket);
     }
 
     private LoginResponsePacket login(Channel channel, LoginRequestPacket loginRequestPacket) {
