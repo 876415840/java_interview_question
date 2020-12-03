@@ -57,3 +57,26 @@
 
 ## 一对一单聊原理
 ![一对一单聊](一对一单聊原理.png)
+
+## ctx.writeAndFlush() 事件传播路径
+![ctx.writeAndFlush() 事件传播路径](ctx.writeAndFlush()%20事件传播路径.png)
+> * ctx.writeAndFlush() 是从 pipeline 链中的当前节点开始往前找到第一个 outBound 类型的 handler 把对象往前进行传播，如果这个对象确认不需要经过其他 outBound 类型的 handler 处理，就使用这个方法。 
+> * 在某个 inBound 类型的 handler 处理完逻辑之后，调用 ctx.writeAndFlush() 可以直接一口气把对象送到 codec 中编码，然后写出去。
+
+## ctx.channel().writeAndFlush() 事件传播路径
+![ctx.channel().writeAndFlush() 事件传播路径](ctx.channel().writeAndFlush()%20事件传播路径.png)
+> * ctx.channel().writeAndFlush() 是从 pipeline 链中的最后一个 outBound 类型的 handler 开始，把对象往前进行传播，如果你确认当前创建的对象需要经过后面的 outBound 类型的 handler，那么就调用此方法。
+> * 在某个 inBound 类型的 handler 处理完逻辑之后，调用 ctx.channel().writeAndFlush()，对象会从最后一个 outBound 类型的 handler 开始，逐个往前进行传播，路径是要比 ctx.writeAndFlush() 要长的。
+> * 由此可见，在我们的应用程序中，当我们没有改造编解码之前，我们必须调用 ctx.channel().writeAndFlush(), 而经过改造之后，我们的编码器（既属于 inBound, 又属于 outBound 类型的 handler）已处于 pipeline 的最前面，因此，可以大胆使用 ctx.writeAndFlush()。
+
+## channelRead0()内部代码应异步处理(线程池)
+> 单个 NIO 线程执行的抽象逻辑
+> ```java
+> List<Channel> channelList = 已有数据可读的 channel
+> for (Channel channel in channelist) {
+>    for (ChannelHandler handler in channel.pipeline()) {
+>        handler.channelRead0();
+>    } 
+> }
+> ```
+> 将channelRead0()内部代码放到线程池中异步执行，这样就可以避免一些耗时的操作影响 Netty 的 NIO 线程，从而影响其他的 channel。

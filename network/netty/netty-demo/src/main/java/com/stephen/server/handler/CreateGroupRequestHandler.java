@@ -4,6 +4,7 @@ import com.stephen.protocol.request.CreateGroupRequestPacket;
 import com.stephen.protocol.response.CreateGroupResponsePacket;
 import com.stephen.util.SessionUtil;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
@@ -14,10 +15,21 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ *
+ * @ChannelHandler.Sharable 注解，表明当前handler可以多个channel共享
+ *
  * @author stephen
  * @date 2020/12/2 5:53 下午
  */
+@ChannelHandler.Sharable
 public class CreateGroupRequestHandler extends SimpleChannelInboundHandler<CreateGroupRequestPacket> {
+
+    public static final CreateGroupRequestHandler INSTANCE = new CreateGroupRequestHandler();
+
+    private CreateGroupRequestHandler() {
+
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CreateGroupRequestPacket createGroupRequestPacket) throws Exception {
         List<String> userIdList = createGroupRequestPacket.getUserIdList();

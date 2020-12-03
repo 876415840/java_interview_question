@@ -7,6 +7,7 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 /**
  * 基于长度域拆包器 （数据包长度上限，长度值偏移量，长度值字节数）-- 参照自定义通信协议
+ * 实现与每个channel有关，所以每个连接需要new一个新对象
  *
  * @author stephen
  * @date 2020/12/3 10:51 上午

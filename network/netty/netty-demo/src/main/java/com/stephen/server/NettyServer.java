@@ -1,9 +1,11 @@
 package com.stephen.server;
 
-import com.stephen.codec.PacketDecoder;
-import com.stephen.codec.PacketEncoder;
+import com.stephen.codec.PacketCodecHandler;
 import com.stephen.codec.Spliter;
-import com.stephen.server.handler.*;
+import com.stephen.server.handler.AuthHandler;
+import com.stephen.server.handler.IMHandler;
+import com.stephen.server.handler.LifeCyCleTestHandler;
+import com.stephen.server.handler.LoginRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -53,28 +55,14 @@ public class NettyServer {
                         ch.pipeline()
                                 // 拆包
                                 .addLast(new Spliter())
-                                // 解码(所有处理前的读数据)
-                                .addLast(new PacketDecoder())
+                                // 解码/编码(所有处理前/后的读/写数据)
+                                .addLast(PacketCodecHandler.INSTANCE)
                                 // 登录请求处理
-                                .addLast(new LoginRequestHandler())
+                                .addLast(LoginRequestHandler.INSTANCE)
                                 // 新增加用户认证handler
-                                .addLast(new AuthHandler())
-                                // 用户消息请求处理
-                                .addLast(new MessageRequestHandler())
-                                // 创建群聊请求处理
-                                .addLast(new CreateGroupRequestHandler())
-                                // 加入群请求处理
-                                .addLast(new JoinGroupRequestHandler())
-                                // 退群请求处理
-                                .addLast(new QuitGroupRequestHandler())
-                                // 获取群成员请求处理
-                                .addLast(new ListGroupMembersRequestHandler())
-                                // 群消息请求处理
-                                .addLast(new GroupMessageRequestHandler())
-                                // 登出请求处理
-                                .addLast(new LogoutRequestHandler())
-                                // 编码(所有处理后的写数据)
-                                .addLast(new PacketEncoder());
+                                .addLast(AuthHandler.INSTANCE)
+                                // 其他请求处理(平行处理)
+                                .addLast(IMHandler.INSTANCE);
 
                     }
                 })

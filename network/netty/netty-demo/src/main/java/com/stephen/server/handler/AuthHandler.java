@@ -1,14 +1,25 @@
 package com.stephen.server.handler;
 
 import com.stephen.util.LoginUtil;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 /**
+ *
+ * @ChannelHandler.Sharable 注解，表明当前handler可以多个channel共享
+ *
  * @author stephen
  * @date 2020/12/2 3:01 下午
  */
+@ChannelHandler.Sharable
 public class AuthHandler extends ChannelInboundHandlerAdapter {
+
+    public static final AuthHandler INSTANCE = new AuthHandler();
+
+    private AuthHandler() {
+
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

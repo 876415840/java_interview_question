@@ -6,6 +6,7 @@ import com.stephen.session.Session;
 import com.stephen.util.LoginUtil;
 import com.stephen.util.SessionUtil;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -13,12 +14,20 @@ import java.util.Date;
 import java.util.Random;
 
 /**
- * 处理登录
+ *
+ * @ChannelHandler.Sharable 注解，表明当前handler可以多个channel共享
  *
  * @author stephen
  * @date 2020/11/30 11:54 上午
  */
+@ChannelHandler.Sharable
 public class LoginRequestHandler extends SimpleChannelInboundHandler<LoginRequestPacket> {
+
+    public static final LoginRequestHandler INSTANCE = new LoginRequestHandler();
+
+    private LoginRequestHandler() {
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, LoginRequestPacket loginRequestPacket) throws Exception {
         // 处理登录
