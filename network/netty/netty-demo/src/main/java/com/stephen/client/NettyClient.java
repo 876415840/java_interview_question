@@ -1,12 +1,15 @@
 package com.stephen.client;
 
+import com.stephen.client.console.ConsoleCommandManager;
+import com.stephen.client.console.LoginConsoleCommand;
+import com.stephen.client.handler.CreateGroupResponseHandler;
 import com.stephen.client.handler.LoginResponseHandler;
+import com.stephen.client.handler.LogoutResponseHandler;
 import com.stephen.client.handler.MessageResponseHandler;
 import com.stephen.codec.PacketDecoder;
 import com.stephen.codec.PacketEncoder;
-import com.stephen.protocol.request.LoginRequestPacket;
-import com.stephen.protocol.request.MessageRequestPacket;
-import com.stephen.util.LoginUtil;
+import com.stephen.codec.Spliter;
+import com.stephen.util.SessionUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -14,7 +17,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 import java.util.Date;
 import java.util.Scanner;
@@ -29,6 +31,8 @@ import java.util.concurrent.TimeUnit;
 public class NettyClient {
 
     private static final int MAX_RETRY = 4;
+    private static final String HOST = "127.0.0.1";
+    private static final int PORT = 1001;
 
     public static void main(String[] args) throws InterruptedException {
         System.out.println("------------------- 客户端启动 --------------------");
@@ -47,12 +51,18 @@ public class NettyClient {
                     protected void initChannel(Channel ch) throws Exception {
                         // 当前链接相关的逻辑处理链 -- 责任链模式
                         ch.pipeline()
-                                // 基于长度域拆包器 （数据包长度上限，长度值偏移量，长度值字节数）-- 参照自定义通信协议
-                                .addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 7, 4))
+                                // 拆包
+                                .addLast(new Spliter())
                                 // 1、解码 -> 2、处理登录/消息 -> 3、编码(对第2步时的响应对象编码)
                                 .addLast(new PacketDecoder())
+                                // 登录响应处理
                                 .addLast(new LoginResponseHandler())
+                                // 登出响应处理
+                                .addLast(new LogoutResponseHandler())
+                                // 消息响应处理
                                 .addLast(new MessageResponseHandler())
+                                // 创建群聊响应处理
+                                .addLast(new CreateGroupResponseHandler())
                                 // 对channel中写入的数据编码
                                 .addLast(new PacketEncoder());
                     }
@@ -64,7 +74,7 @@ public class NettyClient {
                 // 表示是否开始 Nagle 算法，true 表示关闭，false 表示开启，通俗地说，如果要求高实时性，有数据发送时就马上发送，就设置为 true 关闭，如果需要减少发送次数减少网络交互，就设置为 false 开启
                 .option(ChannelOption.TCP_NODELAY, true);
 
-        connect(bootstrap, "127.0.0.1", 1001, MAX_RETRY);
+        connect(bootstrap, HOST, PORT, MAX_RETRY);
 
     }
 
@@ -98,32 +108,16 @@ public class NettyClient {
     }
 
     private static void startConsoleThread(Channel channel) {
-        Scanner sc = new Scanner(System.in);
-        LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
+        ConsoleCommandManager consoleCommandManager = new ConsoleCommandManager();
+        LoginConsoleCommand loginConsoleCommand = new LoginConsoleCommand();
+        Scanner scanner = new Scanner(System.in);
+
         new Thread(() -> {
             while (!Thread.interrupted()) {
-                // 登录成功后可录入消息
-                if (LoginUtil.hasLogin(channel)) {
-                    String toUserId = sc.next();
-                    String message = sc.next();
-                    MessageRequestPacket packet = new MessageRequestPacket();
-                    packet.setToUserId(new Integer(toUserId));
-                    packet.setMessage(message);
-                    channel.writeAndFlush(packet);
+                if (!SessionUtil.hasLogin(channel)) {
+                    loginConsoleCommand.exec(scanner, channel);
                 } else {
-                    System.out.println("输入用户名登录: ");
-                    String username = sc.nextLine();
-                    loginRequestPacket.setUsername(username);
-                    // 使用默认的密码
-                    loginRequestPacket.setPassword("pwd");
-                    channel.writeAndFlush(loginRequestPacket);
-
-                    try {
-                        // 隔一秒登录一个客户端
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    consoleCommandManager.exec(scanner, channel);
                 }
             }
         }).start();

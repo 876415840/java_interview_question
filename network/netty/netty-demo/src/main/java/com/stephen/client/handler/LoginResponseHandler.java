@@ -1,7 +1,8 @@
 package com.stephen.client.handler;
 
 import com.stephen.protocol.response.LoginResponsePacket;
-import com.stephen.util.LoginUtil;
+import com.stephen.session.Session;
+import com.stephen.util.SessionUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -40,7 +41,7 @@ public class LoginResponseHandler extends SimpleChannelInboundHandler<LoginRespo
 
         if (loginResponsePacket.isSuccess()) {
             System.out.println("[" + username + "]登录成功，userId 为: " + userId);
-            LoginUtil.markAsLogin(ctx.channel());
+            SessionUtil.bindSession(new Session(userId, username), ctx.channel());
         } else {
             System.out.println("[" + username + "]登录失败，原因：" + loginResponsePacket.getReason());
         }

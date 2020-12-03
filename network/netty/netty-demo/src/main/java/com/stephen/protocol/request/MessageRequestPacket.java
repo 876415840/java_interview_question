@@ -1,7 +1,9 @@
 package com.stephen.protocol.request;
 
 import com.stephen.protocol.Packet;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import static com.stephen.protocol.Command.MESSAGE_REQUEST;
 
@@ -10,6 +12,8 @@ import static com.stephen.protocol.Command.MESSAGE_REQUEST;
  * @date 2020/11/27 4:38 下午
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MessageRequestPacket extends Packet {
 
     private Integer toUserId;

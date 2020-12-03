@@ -2,19 +2,18 @@ package com.stephen.server;
 
 import com.stephen.codec.PacketDecoder;
 import com.stephen.codec.PacketEncoder;
-import com.stephen.server.handler.AuthHandler;
-import com.stephen.server.handler.LifeCyCleTestHandler;
-import com.stephen.server.handler.LoginRequestHandler;
-import com.stephen.server.handler.MessageRequestHandler;
+import com.stephen.codec.Spliter;
+import com.stephen.server.handler.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+
+import java.util.Date;
 
 /**
  * netty服务端
@@ -23,6 +22,8 @@ import io.netty.util.concurrent.GenericFutureListener;
  * @date 2020/11/26 3:19 下午
  */
 public class NettyServer {
+
+    private static final int PORT = 1001;
 
     public static void main(String[] args) {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -50,14 +51,20 @@ public class NettyServer {
                         ch.pipeline().addLast(new LifeCyCleTestHandler());
                         // 当前链接相关的逻辑处理链 -- 责任链模式
                         ch.pipeline()
-                                // 基于长度域拆包器 （数据包长度上限，长度值偏移量，长度值字节数）-- 参照自定义通信协议
-                                .addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 7, 4))
+                                // 拆包
+                                .addLast(new Spliter())
                                 // 1、解码 -> 2、处理登录/消息 -> 3、编码(对第二步时的响应对象编码)
                                 .addLast(new PacketDecoder())
+                                // 登录请求处理
                                 .addLast(new LoginRequestHandler())
                                 // 新增加用户认证handler
                                 .addLast(new AuthHandler())
+                                // 消息请求处理
                                 .addLast(new MessageRequestHandler())
+                                // 创建群聊请求处理
+                                .addLast(new CreateGroupRequestHandler())
+                                // 登出请求处理
+                                .addLast(new LogoutRequestHandler())
                                 // 对channel中写入的数据编码
                                 .addLast(new PacketEncoder());
 
@@ -70,7 +77,7 @@ public class NettyServer {
                 // 是否开启Nagle算法，true表示关闭，false表示开启，通俗地说，如果要求高实时性，有数据发送时就马上发送，就关闭，如果需要减少发送次数减少网络交互，就开启。
                 .childOption(ChannelOption.TCP_NODELAY, true);
 
-        bind(serverBootstrap, 1001);
+        bind(serverBootstrap, PORT);
 
     }
 
@@ -89,7 +96,7 @@ public class NettyServer {
                     @Override
                     public void operationComplete(Future<? super Void> future) throws Exception {
                         if (future.isSuccess()) {
-                            System.out.println("端口[" + port + "]绑定成功!");
+                            System.out.println(new Date() + "端口[" + port + "]绑定成功!");
                         } else {
                             System.err.println("端口[" + port + "]绑定失败!");
                             bind(serverBootstrap, port + 1);
