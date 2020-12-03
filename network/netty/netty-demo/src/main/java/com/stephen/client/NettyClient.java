@@ -50,13 +50,13 @@ public class NettyClient {
                         ch.pipeline()
                                 // 拆包
                                 .addLast(new Spliter())
-                                // 1、解码 -> 2、处理登录/消息 -> 3、编码(对第2步时的响应对象编码)
+                                // 解码(所有处理前的读数据)
                                 .addLast(new PacketDecoder())
                                 // 登录响应处理
                                 .addLast(new LoginResponseHandler())
                                 // 登出响应处理
                                 .addLast(new LogoutResponseHandler())
-                                // 消息响应处理
+                                // 用户消息响应处理
                                 .addLast(new MessageResponseHandler())
                                 // 创建群聊响应处理
                                 .addLast(new CreateGroupResponseHandler())
@@ -66,7 +66,9 @@ public class NettyClient {
                                 .addLast(new QuitGroupResponseHandler())
                                 // 获取群成员响应处理
                                 .addLast(new ListGroupMembersResponseHandler())
-                                // 对channel中写入的数据编码
+                                // 群消息响应处理
+                                .addLast(new GroupMessageResponseHandler())
+                                // 编码(所有处理后的写数据)
                                 .addLast(new PacketEncoder());
                     }
                 })

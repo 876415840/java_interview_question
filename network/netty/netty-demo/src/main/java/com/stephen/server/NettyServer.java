@@ -49,17 +49,17 @@ public class NettyServer {
                     protected void initChannel(NioSocketChannel ch) {
                         // 添加到第一个，查看 ChannelHandler 回调方法执行顺序
                         ch.pipeline().addLast(new LifeCyCleTestHandler());
-                        // 当前链接相关的逻辑处理链 -- 责任链模式
+                        // 当前链接相关的逻辑处理链 -- 责任链模式 （每次建立连接都会调用一次）
                         ch.pipeline()
                                 // 拆包
                                 .addLast(new Spliter())
-                                // 1、解码 -> 2、处理登录/消息 -> 3、编码(对第二步时的响应对象编码)
+                                // 解码(所有处理前的读数据)
                                 .addLast(new PacketDecoder())
                                 // 登录请求处理
                                 .addLast(new LoginRequestHandler())
                                 // 新增加用户认证handler
                                 .addLast(new AuthHandler())
-                                // 消息请求处理
+                                // 用户消息请求处理
                                 .addLast(new MessageRequestHandler())
                                 // 创建群聊请求处理
                                 .addLast(new CreateGroupRequestHandler())
@@ -69,9 +69,11 @@ public class NettyServer {
                                 .addLast(new QuitGroupRequestHandler())
                                 // 获取群成员请求处理
                                 .addLast(new ListGroupMembersRequestHandler())
+                                // 群消息请求处理
+                                .addLast(new GroupMessageRequestHandler())
                                 // 登出请求处理
                                 .addLast(new LogoutRequestHandler())
-                                // 对channel中写入的数据编码
+                                // 编码(所有处理后的写数据)
                                 .addLast(new PacketEncoder());
 
                     }
